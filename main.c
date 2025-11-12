@@ -1,6 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include "lexer.h"
 
-int main(int argc, int argv[]) {
-    printf("Allo?\n");
+int main(int argc, char **argv) {
+    int token_count;
+    Token *tokens = lexer("129.45 + 345\n", &token_count);
+
+    for (int i = 0; i < token_count; i++)
+    {
+        printf("%f Allooo???\n", tokens[i].data.numeric_value);
+    }
+
+    free(tokens);
     return 0;
 }
