@@ -1,30 +1,51 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-typedef enum {
-    ADD,
-    SUBTRACT,
-    MULTIPLY,
-    DIVIDE,
-    MODULO,
-    UNKOWN,
-} Operation;
+#include <string.h>
 
 typedef enum {
-    NUMBER,
-    OPERATION,
-    UNARY,
-} NodeTypes;
+    TokenType_Error,
+    TokenType_EndOfLine,
 
-typedef union {
-    double numeric_value;
-    Operation operation;
-} Data;
+    TokenType_Number,
+
+    TokenType_Plus,
+    TokenType_Minus,
+    TokenType_Star,
+    TokenType_Slash,
+    TokenType_Percent,
+    TokenType_Caret,
+
+    TokenType_OpenParenthesis,
+    TokenType_CloseParenthesis,
+} TokenType;
+
+typedef enum {
+    NodeType_Error,
+    NodeType_Number,
+    // NodeType_Positive,
+    // NodeType_Negative,
+    NodeType_Add,
+    NodeType_Subtract,
+    NodeType_Multiply,
+    NodeType_Divide,
+    NodeType_Power,
+    NodeType_Modulo,
+} NodeType;
 
 typedef struct {
-    NodeTypes type;
-    Data data;
+    TokenType type;
+    char* lexeme;
 } Token;
 
+typedef struct {
+    NodeType type;
+    int *left;
+    int *right;
+    
+    union {
+        // payload here
+    };
+} Node;
 
 #endif
