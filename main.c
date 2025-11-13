@@ -3,7 +3,7 @@
 #include "lexer.h"
 
 int main(int argc, char **argv) {
-    char example_input[] = "129.45       + - * / % 34.995\n";
+    char example_input[] = "129.45       + - * / % 34.995\n\0";
     // int token_count;
     // Token *tokens = lexer(example_input, &token_count);
 
@@ -17,7 +17,17 @@ int main(int argc, char **argv) {
     Lexer lexer;
     lexer_initialize(&lexer, &example_input[0]);
 
-    lexer_next_token(&lexer);
+    Token tokens[128];
+    int i = 0;
+
+    while (1)
+    {
+        tokens[i] = lexer_next_token(&lexer);
+        printf("token: %s of type %d\n", tokens[i].lexeme, tokens[i].type);
+        
+        if (tokens[i].type == TokenType_EndOfLine) break;
+        i += 1;
+    }
     
     return 0;
 }
