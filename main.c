@@ -4,11 +4,11 @@
 
 int main(int argc, char **argv) {
     int token_count;
-    Token *tokens = lexer("129.45 + 345\n", &token_count);
+    Token *tokens = lexer("129.45       + - * / % 34.995\n", &token_count);
 
     for (int i = 0; i < token_count; i++)
     {
-        printf("%f Allooo???\n", tokens[i].data.numeric_value);
+        printf("%f %d Allooo???\n", tokens[i].data.numeric_value, tokens[i].data.operation);
     }
 
     free(tokens);
