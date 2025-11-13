@@ -87,3 +87,29 @@ Token lexer_next_token(Lexer* lexer)
     };
 }
 
+Token *tokenize(char expression[])
+{
+    Lexer lexer;
+    lexer_initialize(&lexer, &expression[0]);
+
+    int token_count = 32;
+    Token *tokens = (Token*) malloc(token_count * sizeof(Token));
+    int i = 0;
+
+    while (1)
+    {
+        if (i >= token_count)
+        {
+            token_count *= 2;
+            tokens = (Token*) realloc(tokens, token_count * sizeof(Token));
+        }
+
+        tokens[i] = lexer_next_token(&lexer);
+        printf("token: %s of type %d\n", tokens[i].lexeme, tokens[i].type);
+        
+        if (tokens[i].type == TokenType_EndOfLine) break;
+        i += 1;
+    }
+
+    return tokens;
+}
