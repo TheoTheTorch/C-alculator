@@ -20,6 +20,8 @@ Token lexer_create_token(Lexer* lexer, TokenType type);
 
 Token lexer_next_token(Lexer* lexer);
 
-Token* tokenize(char* expression);
+Token* tokenize(char* expression, int* token_count);
+
+void free_tokens(Token* token, int token_count);
 
 #endif

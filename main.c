@@ -8,11 +8,13 @@ int main(int argc, char **argv)
     assert(argc == 2 && "Must provide (exactly one) mathematical expression as argument.");
     char* expression = (char*) argv[1];
 
-    Token* tokens1 = tokenize(expression);
-    Token* tokens2 = tokenize("3.5 + 999 - 1 / 1 * 2 % 2");
+    int count1;
+    int count2;
+    Token* tokens1 = tokenize(expression, &count1);
+    Token* tokens2 = tokenize("3.5 + 999 - 1 / 1 * 2 % 2", &count2);
     
-    free(tokens1);
-    free(tokens2);
+    free_tokens(tokens1, count1);
+    free_tokens(tokens2, count2);
 
     return 0;
 }

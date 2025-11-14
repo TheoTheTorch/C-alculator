@@ -26,7 +26,7 @@ void lexer_skip_whitespace(Lexer* lexer)
 Token lexer_create_token(Lexer* lexer, TokenType type)
 {
     int length = (lexer->current) - (lexer->start);
-    char lexeme[length * 256]; // magic number?
+    char* lexeme = (char*) malloc(length * sizeof(char));
 
     for (int i = 0; i < length; i++)
     {
@@ -84,21 +84,21 @@ Token lexer_next_token(Lexer* lexer)
     };
 }
 
-Token *tokenize(char expression[])
+Token *tokenize(char expression[], int* token_count)
 {
     Lexer lexer;
     lexer_initialize(&lexer, &expression[0]);
 
-    int token_count = 32;
-    Token *tokens = (Token*) malloc(token_count * sizeof(Token));
+    *token_count = 4;
+    Token *tokens = (Token*) malloc(*token_count * sizeof(Token));
     int i = 0;
 
     while (1)
     {
-        if (i >= token_count)
+        if (i >= *token_count)
         {
-            token_count *= 2;
-            tokens = (Token*) realloc(tokens, token_count * sizeof(Token));
+            *token_count *= 2;
+            tokens = (Token*) realloc(tokens, *token_count * sizeof(Token));
         }
 
         tokens[i] = lexer_next_token(&lexer);
@@ -110,3 +110,13 @@ Token *tokenize(char expression[])
 
     return tokens;
 }
+
+void free_tokens(Token* tokens, int tokens_count)
+{
+    for (int i = 0; i < tokens_count; i++)
+    {
+        // freeing a single token involves only freeing the lexeme
+        free(tokens[i].lexeme);
+    }
+    free(tokens);
+}   
