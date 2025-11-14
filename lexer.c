@@ -25,19 +25,17 @@ void lexer_skip_whitespace(Lexer* lexer)
 
 Token lexer_create_token(Lexer* lexer, TokenType type)
 {
-
     int length = (lexer->current) - (lexer->start);
-    char lexeme[length];
-
+    char lexeme[length * 256]; // magic number?
 
     for (int i = 0; i < length; i++)
     {
-        printf("%c", *(lexer->start + i));
         lexeme[i] = *(lexer->start + i);
     }
 
-    lexeme[length] = ' ';
+    lexeme[length] = '\0';
 
+    printf("lexeme %s --- ", lexeme);
     return (Token) {
         .type = type,
         .lexeme = lexeme,
@@ -61,8 +59,6 @@ Token lexer_next_token(Lexer* lexer)
     lexer_advance(lexer);
     lexer->start = lexer->current - 1;
     char current_character = *(lexer->current - 1);
-    
-    printf("char %c ", current_character);
 
     if (current_character == '\0')
     {
@@ -74,6 +70,7 @@ Token lexer_next_token(Lexer* lexer)
         case '\0': return lexer_create_token(lexer, TokenType_EndOfLine);
         case '+': return lexer_create_token(lexer, TokenType_Plus);
         case '-': return lexer_create_token(lexer, TokenType_Minus);
+        case '*': return lexer_create_token(lexer, TokenType_Star);
         case '/': return lexer_create_token(lexer, TokenType_Slash);
         case '%': return lexer_create_token(lexer, TokenType_Percent);
         case '^': return lexer_create_token(lexer, TokenType_Caret);

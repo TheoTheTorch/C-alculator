@@ -1,7 +1,9 @@
+#include <string.h>
+
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <string.h>
+#define Token_Max_Length 128
 
 typedef enum {
     TokenType_Error,
@@ -35,7 +37,7 @@ typedef enum {
 
 typedef struct {
     TokenType type;
-    char* lexeme;
+    char *lexeme;
 } Token;
 
 typedef struct {
