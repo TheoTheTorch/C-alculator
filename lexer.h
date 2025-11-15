@@ -8,6 +8,8 @@ typedef struct Lexer
     char* current;
 } Lexer;
 
+// Lexer functions
+// ---------------
 void lexer_initialize(Lexer* lexer, char* expression_start);
 
 void lexer_advance(Lexer* lexer);
@@ -19,9 +21,15 @@ Token lexer_number(Lexer* lexer);
 Token lexer_create_token(Lexer* lexer, TokenType type);
 
 Token lexer_next_token(Lexer* lexer);
+// ---------------
 
-Token* tokenize(char* expression, int* token_count);
+// Tokenizer utilities
+// -------------------
+Token* tokenize(char* expression);
 
-void free_tokens(Token* token, int token_count);
+void free_tokens(Token* token);
+
+void print_tokens(Token* tokens);
+// -------------------
 
 #endif

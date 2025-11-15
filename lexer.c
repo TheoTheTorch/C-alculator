@@ -32,10 +32,8 @@ Token lexer_create_token(Lexer* lexer, TokenType type)
     {
         lexeme[i] = *(lexer->start + i);
     }
-
     lexeme[length] = '\0';
 
-    printf("lexeme %s --- ", lexeme);
     return (Token) {
         .type = type,
         .lexeme = lexeme,
@@ -84,39 +82,54 @@ Token lexer_next_token(Lexer* lexer)
     };
 }
 
-Token *tokenize(char expression[], int* token_count)
+Token *tokenize(char *expression)
 {
+    if (strlen(expression) == 0)
+        return (Token*) { };
+    
     Lexer lexer;
     lexer_initialize(&lexer, &expression[0]);
 
-    *token_count = 4;
-    Token *tokens = (Token*) malloc(*token_count * sizeof(Token));
+    // int reserved_space = 1;
     int i = 0;
+    // allocate the theoretical maximum amount of tokens + \0
+    Token *tokens = (Token*) malloc(strlen(expression) * sizeof(Token) + 1);
 
     while (1)
     {
-        if (i >= *token_count)
-        {
-            *token_count *= 2;
-            tokens = (Token*) realloc(tokens, *token_count * sizeof(Token));
-        }
-
         tokens[i] = lexer_next_token(&lexer);
-        printf("token: %s of type %d\n", tokens[i].lexeme, tokens[i].type);
-        
-        if (tokens[i].type == TokenType_EndOfLine) break;
+
+        if (tokens[i].type == TokenType_EndOfLine)
+            break;
         i += 1;
     }
 
     return tokens;
 }
 
-void free_tokens(Token* tokens, int tokens_count)
-{
-    for (int i = 0; i < tokens_count; i++)
+void free_tokens(Token* tokens)
+{   
+    int i = 0;
+    while (1)
     {
-        // freeing a single token involves only freeing the lexeme
         free(tokens[i].lexeme);
+
+        if (tokens[i].type == TokenType_EndOfLine)
+            break;
+        i += 1;
     }
     free(tokens);
-}   
+}
+
+void print_tokens(Token* tokens)
+{
+    int i = 0;
+    while (1)
+    {
+        printf("token %s | type %d\n", tokens[i].lexeme, tokens[i].type);
+
+        if (tokens[i].type == TokenType_EndOfLine)
+            break;
+        i += 1;
+    }
+}
