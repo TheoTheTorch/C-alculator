@@ -1,9 +1,8 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <ctype.h>
 #include "lexer.h"
 
-void lexer_initialize(Lexer* lexer, char *expression_start)
+void lexer_initialize(Lexer* lexer, char* expression_start)
 {
     lexer->start = expression_start;
     lexer->current = expression_start;
@@ -25,11 +24,11 @@ void lexer_skip_whitespace(Lexer* lexer)
 Token lexer_create_token(Lexer* lexer, TokenType type)
 {
     int length = (lexer->current) - (lexer->start);
-    char* lexeme = (char*) malloc(length * sizeof(char));
+    char* lexeme = (char*) malloc(length*  sizeof(char));
 
     for (int i = 0; i < length; i++)
     {
-        lexeme[i] = *(lexer->start + i);
+        lexeme[i] =* (lexer->start + i);
     }
     lexeme[length] = '\0';
 
@@ -41,7 +40,7 @@ Token lexer_create_token(Lexer* lexer, TokenType type)
 
 Token lexer_number(Lexer* lexer)
 {
-    while (isdigit(*lexer->current) || *lexer->current == '.')
+    while (isdigit(*lexer->current) ||* lexer->current == '.')
     {
         lexer_advance(lexer);
     }
@@ -55,7 +54,7 @@ Token lexer_next_token(Lexer* lexer)
     
     lexer_advance(lexer);
     lexer->start = lexer->current - 1;
-    char current_character = *(lexer->current - 1);
+    char current_character =* (lexer->current - 1);
 
     if (current_character == '\0')
     {

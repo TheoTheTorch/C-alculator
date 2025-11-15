@@ -39,7 +39,7 @@ typedef enum {
 
 typedef struct {
     TokenType type;
-    char *lexeme;
+    char* lexeme;
 } Token;
 
 typedef struct {
@@ -47,8 +47,8 @@ typedef struct {
     
     union {
         double value;
-        struct { int *operation; } unary;
-        struct { int *left; int *right; } binary;
+        struct { int* operation; } unary;
+        struct { int* left; int* right; } binary;
     };
 } Node;
 

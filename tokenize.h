@@ -1,8 +1,10 @@
 #ifndef TOKENIZE_H
 #define TOKENIZE_H
-#include "Core/types.h"
+#include "types.h"
 
 Token* tokenize(char* expression);
+
+int count_tokens(Token* tokens);
 
 void free_tokens(Token* token);
 
