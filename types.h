@@ -3,8 +3,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define Token_Max_Length 128
-
 typedef enum {
     TokenType_Error,
     TokenType_EndOfLine,
@@ -13,20 +11,24 @@ typedef enum {
 
     TokenType_Plus,
     TokenType_Minus,
+    TokenType_Percent,
     TokenType_Star,
     TokenType_Slash,
-    TokenType_Percent,
     TokenType_Caret,
 
-    TokenType_OpenParenthesis,
-    TokenType_CloseParenthesis,
+    // TokenType_OpenParenthesis,
+    // TokenType_CloseParenthesis,
 } TokenType;
 
 typedef enum {
     NodeType_Error,
     NodeType_Number,
-    // NodeType_Positive,
-    // NodeType_Negative,
+
+    // Unaries
+    NodeType_Positive,
+    NodeType_Negative,
+
+    // Binaries
     NodeType_Add,
     NodeType_Subtract,
     NodeType_Multiply,
@@ -42,11 +44,11 @@ typedef struct {
 
 typedef struct {
     NodeType type;
-    int *left;
-    int *right;
     
     union {
-        // payload here
+        double value;
+        struct { int *operation; } unary;
+        struct { int *left; int *right; } binary;
     };
 } Node;
 

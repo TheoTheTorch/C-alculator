@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "lexer.h"
+#include "tokenize.h"
 
 int main(int argc, char **argv)
 {    
@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 
     Token* tokens1 = tokenize(expression);
     Token* tokens2 = tokenize("3.5 + 999 - 1 / 1 * 2 % 2");
-    Token* tokens3 = tokenize("");
+    Token* tokens3 = tokenize(" ");
 
     print_tokens(tokens1);
     print_tokens(tokens2);
