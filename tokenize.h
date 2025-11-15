@@ -1,6 +1,6 @@
 #ifndef TOKENIZE_H
 #define TOKENIZE_H
-#include "types.h"
+#include "Core/types.h"
 
 Token* tokenize(char* expression);
 

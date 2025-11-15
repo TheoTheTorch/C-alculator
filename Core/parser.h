@@ -1,10 +1,12 @@
 #ifndef PARSER_H
 #define PARSER_H
+#include "lexer.h"
+#include "types.h"
 
 typedef struct Parser
 {
-    char* start;
-    char* current;
+    Lexer *lexer;
+    Token *token;
 } Parser;
 
 #endif

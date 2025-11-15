@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tokenize.h"
-#include "lexer.h"
+#include "Core/lexer.h"
 
 Token *tokenize(char *expression)
 {
