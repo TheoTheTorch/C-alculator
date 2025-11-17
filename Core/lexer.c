@@ -1,6 +1,6 @@
+#include "lexer.h"
 #include <stdlib.h>
 #include <ctype.h>
-#include "lexer.h"
 
 void lexer_initialize(Lexer* lexer, char* expression_start)
 {

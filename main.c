@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "tokenize.h"
+#include "pipeline.h"
 
 int main(int argc, char* *argv)
 {    

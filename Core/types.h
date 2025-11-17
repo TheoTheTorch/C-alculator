@@ -1,7 +1,8 @@
-#include <string.h>
-
 #ifndef TYPES_H
 #define TYPES_H
+
+#include <string.h>
+
 
 typedef enum {
     TokenType_Error,
@@ -18,6 +19,7 @@ typedef enum {
 
     // TokenType_OpenParenthesis,
     // TokenType_CloseParenthesis,
+    TokenType_Max,
 } TokenType;
 
 typedef enum {

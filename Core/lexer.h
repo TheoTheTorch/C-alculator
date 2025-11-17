@@ -1,5 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
+
 #include "types.h"
 
 typedef struct Lexer

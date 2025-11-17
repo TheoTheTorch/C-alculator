@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tokenize.h"
-#include "lexer.h"
+#include "pipeline.h"
 
 Token* tokenize(char* expression)
 {
@@ -56,4 +55,9 @@ void print_tokens(Token* tokens)
     {
         printf("token %s | type %d\n", tokens[i].lexeme, tokens[i].type);
     }
+}
+
+Node *parse(Token *tokens)
+{
+    return nullptr;
 }
