@@ -12,6 +12,8 @@ int main(int argc, char* *argv)
     Token* tokens2 = tokenize("3.5 + 999 - 1 / 1*  2 % 2");
     Token* tokens3 = tokenize(" ");
 
+    Node* first_node = parse(tokens1);
+
     print_tokens(tokens1);
     print_tokens(tokens2);
     print_tokens(tokens3);

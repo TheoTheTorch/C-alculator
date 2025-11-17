@@ -57,7 +57,16 @@ void print_tokens(Token* tokens)
     }
 }
 
-Node *parse(Token *tokens)
+Node* parse(Token* tokens)
 {
-    return nullptr;
+    if (count_tokens(tokens) == 0)
+        return (Node*) { };
+
+    Parser parser;
+    parser_initialize(&parser, tokens);
+
+    Node* first_node = parser_parse_expression(&parser, Precedence_Min); 
+    
+    printf("first node value %f\n", first_node->value);
+    return first_node;
 }

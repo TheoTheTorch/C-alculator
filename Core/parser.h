@@ -26,7 +26,7 @@ void parser_advance(Parser* parser);
 
 Node* parser_parse_number(Parser* parser);
 
-Node* parser_parse_infix_expression(Parser parser, Token operator, Node* left);
+Node* parser_parse_infix_expression(Parser* parser, Token operator, Node* left);
 
 Node* parser_parse_expression(Parser* parser, Precedence previous_precedence);
 
