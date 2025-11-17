@@ -19,9 +19,12 @@ void print_tokens(Token* tokens);
 // Parser
 // ------------
 Node* parse(Token* tokens);
+
+void free_nodes(Node* first_node);
 // ------------
 
 // Eval
 // ------------
+double evaluate_expression(char* expression);
 // ------------
 #endif

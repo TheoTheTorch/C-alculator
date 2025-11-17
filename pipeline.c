@@ -70,3 +70,23 @@ Node* parse(Token* tokens)
     printf("first node type %d\n", first_node->type);
     return first_node;
 }
+
+void free_nodes(Node *first_node)
+{
+    // Todo
+}
+
+double evaluate_expression(char *expression)
+{
+    Token* tokens = tokenize(expression);
+
+    Node* first_node = parse(tokens);
+
+    free_tokens(tokens);
+
+    double result = evaluate(first_node);
+
+    free_nodes(first_node);
+
+    return result;
+}
