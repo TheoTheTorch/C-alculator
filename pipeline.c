@@ -60,15 +60,19 @@ void print_tokens(Token* tokens)
 Node* parse(Token* tokens)
 {
     if (count_tokens(tokens) == 0)
-        return (Node*) { };
+    {
+        Node* to_return = (Node*) malloc(sizeof(Node));
+        Node temp = { .type = NodeType_Error };
+        to_return = &temp;
+        return to_return;
+    }
 
     Parser parser;
     parser_initialize(&parser, tokens);
 
-    Node* first_node = parser_parse_expression(&parser, Precedence_Min); 
+    Node* to_return = parser_parse_expression(&parser, Precedence_Min); 
     
-    printf("first node type %d\n", first_node->type);
-    return first_node;
+    return to_return;
 }
 
 void free_nodes(Node *first_node)
