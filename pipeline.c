@@ -67,6 +67,6 @@ Node* parse(Token* tokens)
 
     Node* first_node = parser_parse_expression(&parser, Precedence_Min); 
     
-    printf("first node value %f\n", first_node->value);
+    printf("first node type %d\n", first_node->type);
     return first_node;
 }

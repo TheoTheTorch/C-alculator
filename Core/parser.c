@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static Precedence precedence_lookup[TokenType_Max] = {
     [TokenType_Plus] = Precedence_Term,
@@ -28,6 +29,8 @@ Node* parser_parse_number(Parser *parser)
     to_return->type = NodeType_Number;
     to_return->value = atoi(parser->current->lexeme);
 
+    printf("parser_parse_number value: %f\n", to_return->value);
+
     parser_advance(parser);
     
     return to_return;
@@ -52,6 +55,10 @@ Node* parser_parse_infix_expression(Parser* parser, Token operator, Node* left)
     }
     to_return->binary.left = (int*) left;
     to_return->binary.right = (int*) parser_parse_expression(parser, precedence_lookup[operator.type]);
+
+    printf("parser_parse_infix_expression left: %d right: %d\n",
+        ((Node*) to_return->binary.left)->type,
+        ((Node*) to_return->binary.right)->type);
     
     return to_return;
 }
