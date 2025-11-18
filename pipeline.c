@@ -27,39 +27,37 @@ Token* tokenize(char* expression)
     return tokens;
 }
 
-int count_tokens(Token* tokens)
-{
+void free_tokens(Token* tokens)
+{   
     int i = 0;
     while (1)
     {
+        free(tokens[i].lexeme);
+
         if (tokens[i].type == TokenType_EndOfLine)
             break;
         i += 1;
     }
 
-    return i;
-}
-
-void free_tokens(Token* tokens)
-{   
-    for (int i = 0; i < count_tokens(tokens); i++)
-    {
-        free(tokens[i].lexeme);
-    }
     free(tokens);
 }
 
 void print_tokens(Token* tokens)
 {
-    for (int i = 0; i < count_tokens(tokens); i++)
+    int i = 0;
+    while (1)
     {
         printf("token %s | type %d\n", tokens[i].lexeme, tokens[i].type);
+
+        if (tokens[i].type == TokenType_EndOfLine)
+            break;
+        i += 1;
     }
 }
 
 Node* parse(Token* tokens)
 {
-    if (count_tokens(tokens) == 0)
+    if (tokens[0].type == TokenType_EndOfLine || tokens[0].type == TokenType_Error)
     {
         Node* to_return = (Node*) malloc(sizeof(Node));
         Node temp = { .type = NodeType_Error };
@@ -80,16 +78,24 @@ void free_nodes(Node *first_node)
     // Todo
 }
 
+void print_nodes(Node *first)
+{
+    // Todo
+}
+
 double evaluate_expression(char *expression)
 {
     Token* tokens = tokenize(expression);
 
+    print_tokens(tokens);
+
     Node* first_node = parse(tokens);
 
-    free_tokens(tokens);
-
+    print_nodes(first_node);
+    
     double result = evaluate(first_node);
-
+    
+    free_tokens(tokens);
     free_nodes(first_node);
 
     return result;

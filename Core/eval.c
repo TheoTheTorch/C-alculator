@@ -1,7 +1,7 @@
 #include "eval.h"
 #include <math.h>
 
-#define unary_node evaluate( (Node*) node->unary.operation )
+#define unary_node evaluate( (Node*) node->unary.operand )
 #define left_node evaluate( (Node*) node->binary.left )
 #define right_node evaluate( (Node*) node->binary.right )
 

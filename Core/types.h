@@ -3,7 +3,6 @@
 
 #include <string.h>
 
-
 typedef enum {
     TokenType_Error,
     TokenType_EndOfLine,
@@ -17,8 +16,8 @@ typedef enum {
     TokenType_Slash,
     TokenType_Caret,
 
-    // TokenType_OpenParenthesis,
-    // TokenType_CloseParenthesis,
+    TokenType_OpenParenthesis,
+    TokenType_CloseParenthesis,
     TokenType_Max,
 } TokenType;
 
@@ -39,6 +38,16 @@ typedef enum {
     NodeType_Modulo,
 } NodeType;
 
+typedef enum {
+    Precedence_Min,
+
+    Precedence_Term,
+    Precedence_Factor,
+    Precedence_Power,
+
+    Precedence_Max,
+} Precedence;
+
 typedef struct {
     TokenType type;
     char* lexeme;
@@ -49,7 +58,7 @@ typedef struct {
     
     union {
         double value;
-        struct { int* operation; } unary;
+        struct { int* operand; } unary;
         struct { int* left; int* right; } binary;
     };
 } Node;

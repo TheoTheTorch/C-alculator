@@ -22,14 +22,39 @@ void parser_advance(Parser *parser)
     parser->current += 1;
 }
 
-Node* parser_parse_number(Parser *parser)
+Node *parser_parse_terminal_expression(Parser *parser)
 {
-    Node* to_return = (Node*) malloc(sizeof(Node));
-    to_return->type = NodeType_Number;
-    to_return->value = atoi(parser->current->lexeme);
-
-    parser_advance(parser);
-    
+    Node* to_return = nullptr;
+    switch (parser->current->type)
+    {
+        case TokenType_Number: 
+            to_return = (Node*) malloc(sizeof(Node));
+            to_return->type = NodeType_Number;
+            to_return->value = atof(parser->current->lexeme);
+            parser_advance(parser);
+            break;
+        case TokenType_OpenParenthesis:
+            parser_advance(parser);
+            to_return = parser_parse_expression(parser, Precedence_Min);
+            if (parser->current->type == TokenType_CloseParenthesis)
+            {
+                parser_advance(parser);
+            }
+            break;
+        case TokenType_Plus:
+            parser_advance(parser);
+            to_return = (Node*) malloc(sizeof(Node));
+            to_return->type = NodeType_Positive;
+            to_return->unary.operand = (int*) parser_parse_terminal_expression(parser);
+            break;
+        case TokenType_Minus:
+            parser_advance(parser);
+            to_return = (Node*) malloc(sizeof(Node));
+            to_return->type = NodeType_Negative;
+            to_return->unary.operand = (int*) parser_parse_terminal_expression(parser);
+            break;
+        default: break;
+    }
     return to_return;
 }
 
@@ -38,10 +63,6 @@ Node* parser_parse_infix_expression(Parser* parser, Token operator, Node* left)
     Node* to_return = (Node*) malloc(sizeof(Node));
     switch (operator.type)
     {
-        // case TokenType_EndOfLine: break;
-        // case TokenType_Number: break;
-        // case TokenType_Error: break;
-
         case TokenType_Plus: to_return->type = NodeType_Add; break;
         case TokenType_Minus: to_return->type = NodeType_Subtract; break;
         case TokenType_Star: to_return->type = NodeType_Multiply; break;
@@ -58,7 +79,7 @@ Node* parser_parse_infix_expression(Parser* parser, Token operator, Node* left)
 
 Node* parser_parse_expression(Parser* parser, Precedence previous_precedence)
 {
-    Node *left = parser_parse_number(parser);
+    Node *left = parser_parse_terminal_expression(parser);
     Token current_operator = *(parser->current);
     Precedence current_precedence = precedence_lookup[current_operator.type];
 

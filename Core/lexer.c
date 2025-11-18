@@ -40,13 +40,12 @@ Token lexer_create_token(Lexer* lexer, TokenType type)
 
 Token lexer_number(Lexer* lexer)
 {
-    while (isdigit(*lexer->current) ||* lexer->current == '.')
+    while (isdigit(*lexer->current) || *lexer->current == '.')
     {
         lexer_advance(lexer);
     }
     return lexer_create_token(lexer, TokenType_Number);
 }
-
 
 Token lexer_next_token(Lexer* lexer)
 {
@@ -70,6 +69,8 @@ Token lexer_next_token(Lexer* lexer)
         case '/': return lexer_create_token(lexer, TokenType_Slash);
         case '%': return lexer_create_token(lexer, TokenType_Percent);
         case '^': return lexer_create_token(lexer, TokenType_Caret);
+        case '(': return lexer_create_token(lexer, TokenType_OpenParenthesis);
+        case ')': return lexer_create_token(lexer, TokenType_CloseParenthesis);
 
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':  case '.':
