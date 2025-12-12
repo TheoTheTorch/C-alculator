@@ -1,19 +1,17 @@
 #include "lexer.h"
-#include <stdlib.h>
-#include <ctype.h>
 
-void lexer_initialize(Lexer* lexer, char* expression_start)
+void lexer_initialize(Lexer *lexer, char *expression_start)
 {
     lexer->start = expression_start;
     lexer->current = expression_start;
 }
 
-void lexer_advance(Lexer* lexer)
+void lexer_advance(Lexer *lexer)
 {
     lexer->current += 1;
 }
 
-void lexer_skip_whitespace(Lexer* lexer)
+void lexer_skip_whitespace(Lexer *lexer)
 {
     while (isspace(*lexer->current))
     {
@@ -21,14 +19,14 @@ void lexer_skip_whitespace(Lexer* lexer)
     }
 }
 
-Token lexer_create_token(Lexer* lexer, TokenType type)
+Token lexer_create_token(Lexer *lexer, TokenType type)
 {
     int length = (lexer->current) - (lexer->start);
-    char* lexeme = (char*) malloc(length*  sizeof(char));
+    char *lexeme = (char*) malloc(length * sizeof(char));
 
     for (int i = 0; i < length; i++)
     {
-        lexeme[i] =* (lexer->start + i);
+        lexeme[i] = *(lexer->start + i);
     }
     lexeme[length] = '\0';
 
@@ -38,7 +36,7 @@ Token lexer_create_token(Lexer* lexer, TokenType type)
     };
 }
 
-Token lexer_number(Lexer* lexer)
+Token lexer_number(Lexer *lexer)
 {
     while (isdigit(*lexer->current) || *lexer->current == '.')
     {
@@ -47,22 +45,22 @@ Token lexer_number(Lexer* lexer)
     return lexer_create_token(lexer, TokenType_Number);
 }
 
-Token lexer_next_token(Lexer* lexer)
+Token lexer_next_token(Lexer *lexer)
 {
     lexer_skip_whitespace(lexer);
     
     lexer_advance(lexer);
     lexer->start = lexer->current - 1;
-    char current_character =* (lexer->current - 1);
+    char current_character = *(lexer->current - 1);
 
     if (current_character == '\0')
     {
-        return lexer_create_token(lexer, TokenType_EndOfLine);
+        return lexer_create_token(lexer, TokenType_EOF);
     }
 
     switch (current_character)
     {
-        case '\0': return lexer_create_token(lexer, TokenType_EndOfLine);
+        case '\0': return lexer_create_token(lexer, TokenType_EOF);
         case '+': return lexer_create_token(lexer, TokenType_Plus);
         case '-': return lexer_create_token(lexer, TokenType_Minus);
         case '*': return lexer_create_token(lexer, TokenType_Star);

@@ -1,5 +1,9 @@
 #ifndef PIPELINE_H
 #define PIPELINE_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "Core/types.h"
 #include "Core/lexer.h"
 #include "Core/parser.h"
@@ -7,24 +11,24 @@
 
 // Lexer
 // ------------
-Token* tokenize(char* expression);
+Token *tokenize(char *expression);
 
-void free_tokens(Token* token);
+void free_tokens(Token *token);
 
-void print_tokens(Token* tokens);
+void print_tokens(Token *tokens);
 // ------------
 
 // Parser
 // ------------
-Node* parse(Token* tokens);
+Node *parse(Token *tokens);
 
-void free_nodes(Node* first_node);
+void free_nodes(Node *first_node);
 
-void print_nodes(Node* first);
+void print_nodes(Node *first, int depth);
 // ------------
 
 // Eval
 // ------------
-double evaluate_expression(char* expression);
+double evaluate_expression(char *expression);
 // ------------
 #endif

@@ -1,11 +1,10 @@
 #include "eval.h"
-#include <math.h>
 
-#define unary_node evaluate( (Node*) node->unary.operand )
-#define left_node evaluate( (Node*) node->binary.left )
-#define right_node evaluate( (Node*) node->binary.right )
+#define unary_node evaluate( node->unary.operand )
+#define left_node evaluate( node->binary.left )
+#define right_node evaluate( node->binary.right )
 
-double evaluate(Node* node)
+double evaluate(Node *node)
 {
     switch (node->type)
     {

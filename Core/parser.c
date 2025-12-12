@@ -1,6 +1,4 @@
 #include "parser.h"
-#include <string.h>
-#include <stdlib.h>
 
 static Precedence precedence_lookup[TokenType_Max] = {
     [TokenType_Plus] = Precedence_Term,
@@ -11,7 +9,7 @@ static Precedence precedence_lookup[TokenType_Max] = {
     [TokenType_Caret] = Precedence_Power,
 };
 
-void parser_initialize(Parser* parser, Token* start)
+void parser_initialize(Parser *parser, Token *start)
 {
     parser->start = start;
     parser->current = start;
@@ -24,11 +22,11 @@ void parser_advance(Parser *parser)
 
 Node *parser_parse_terminal_expression(Parser *parser)
 {
-    Node* to_return = nullptr;
+    Node *to_return = NULL;
     switch (parser->current->type)
     {
         case TokenType_Number: 
-            to_return = (Node*) malloc(sizeof(Node));
+            to_return = malloc(sizeof(Node));
             to_return->type = NodeType_Number;
             to_return->value = atof(parser->current->lexeme);
             parser_advance(parser);
@@ -43,24 +41,24 @@ Node *parser_parse_terminal_expression(Parser *parser)
             break;
         case TokenType_Plus:
             parser_advance(parser);
-            to_return = (Node*) malloc(sizeof(Node));
+            to_return = malloc(sizeof(Node));
             to_return->type = NodeType_Positive;
-            to_return->unary.operand = (int*) parser_parse_terminal_expression(parser);
+            to_return->unary.operand = parser_parse_terminal_expression(parser);
             break;
         case TokenType_Minus:
             parser_advance(parser);
-            to_return = (Node*) malloc(sizeof(Node));
+            to_return = malloc(sizeof(Node));
             to_return->type = NodeType_Negative;
-            to_return->unary.operand = (int*) parser_parse_terminal_expression(parser);
+            to_return->unary.operand = parser_parse_terminal_expression(parser);
             break;
         default: break;
     }
     return to_return;
 }
 
-Node* parser_parse_infix_expression(Parser* parser, Token operator, Node* left)
+Node *parser_parse_infix_expression(Parser *parser, Token operator, Node *left)
 {
-    Node* to_return = (Node*) malloc(sizeof(Node));
+    Node *to_return = malloc(sizeof(Node));
     switch (operator.type)
     {
         case TokenType_Plus: to_return->type = NodeType_Add; break;
@@ -71,20 +69,20 @@ Node* parser_parse_infix_expression(Parser* parser, Token operator, Node* left)
         case TokenType_Caret: to_return->type = NodeType_Power; break;
         default: break;
     }
-    to_return->binary.left = (int*) left;
-    to_return->binary.right = (int*) parser_parse_expression(parser, precedence_lookup[operator.type]);
+    to_return->binary.left = left;
+    to_return->binary.right = parser_parse_expression(parser, precedence_lookup[operator.type]);
     
     return to_return;
 }
 
-Node* parser_parse_expression(Parser* parser, Precedence previous_precedence)
+Node *parser_parse_expression(Parser *parser, Precedence previous_precedence)
 {
     Node *left = parser_parse_terminal_expression(parser);
     Token current_operator = *(parser->current);
     Precedence current_precedence = precedence_lookup[current_operator.type];
 
     // All tokens with no precedence assigned to them will become Precedence_Min
-    // This includes the token with type TokenType_EndOfLine, therefore we exit there automatically
+    // This includes the token with type TokenType_EOF, therefore we exit there automatically
     int is_current_operator_valid = current_precedence != Precedence_Min;
     while (is_current_operator_valid)
     {

@@ -1,11 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <string.h>
-
 typedef enum {
     TokenType_Error,
-    TokenType_EndOfLine,
+    TokenType_EOF,
 
     TokenType_Number,
 
@@ -50,16 +48,16 @@ typedef enum {
 
 typedef struct {
     TokenType type;
-    char* lexeme;
+    char *lexeme;
 } Token;
 
-typedef struct {
+typedef struct n {
     NodeType type;
     
     union {
         double value;
-        struct { int* operand; } unary;
-        struct { int* left; int* right; } binary;
+        struct { struct n *operand; } unary;
+        struct { struct n *left; struct n *right; } binary;
     };
 } Node;
 
