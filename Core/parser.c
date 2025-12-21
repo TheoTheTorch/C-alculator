@@ -1,6 +1,6 @@
 #include "parser.h"
 
-static Precedence precedence_lookup[TokenType_Max] = {
+static const Precedence precedence_lookup[] = {
     [TokenType_Plus] = Precedence_Term,
     [TokenType_Minus] = Precedence_Term,
     [TokenType_Star] = Precedence_Factor,
@@ -9,69 +9,71 @@ static Precedence precedence_lookup[TokenType_Max] = {
     [TokenType_Caret] = Precedence_Power,
 };
 
+static const NodeType binary_operation_lookup[] = {
+    [TokenType_Plus] = NodeType_Add,
+    [TokenType_Minus] = NodeType_Subtract,
+    [TokenType_Star] = NodeType_Multiply,
+    [TokenType_Slash] = NodeType_Divide,
+    [TokenType_Percent] = NodeType_Modulo,
+    [TokenType_Caret] = NodeType_Power,
+};
+
+static const NodeType terminal_expression_lookup[] = {
+    [TokenType_Number] = NodeType_Number,
+    [TokenType_Plus] = NodeType_Positive,
+    [TokenType_Minus] = NodeType_Negative,
+};
+
 void parser_initialize(Parser *parser, Token *start)
 {
-    parser->start = start;
     parser->current = start;
 }
 
-void parser_advance(Parser *parser)
+static void parser_advance(Parser *parser)
 {
     parser->current += 1;
 }
 
-Node *parser_parse_terminal_expression(Parser *parser)
+static Node *parser_parse_terminal_expression(Parser *parser)
 {
-    Node *to_return = NULL;
+    Node *to_return = malloc(sizeof(Node));
+    
+    to_return->type = terminal_expression_lookup[parser->current->type];
+    
     switch (parser->current->type)
     {
-        case TokenType_Number: 
-            to_return = malloc(sizeof(Node));
-            to_return->type = NodeType_Number;
-            to_return->value = atof(parser->current->lexeme);
+        case TokenType_Number:
+            Token *token = parser->current;
+            to_return->value = strtod(token->start, &token->end);
             parser_advance(parser);
-            break;
+            return to_return;
         case TokenType_OpenParenthesis:
             parser_advance(parser);
             to_return = parser_parse_expression(parser, Precedence_Min);
-            if (parser->current->type == TokenType_CloseParenthesis)
-            {
-                parser_advance(parser);
-            }
-            break;
+            if (parser->current->type == TokenType_CloseParenthesis) parser_advance(parser);
+            return to_return;
         case TokenType_Plus:
             parser_advance(parser);
-            to_return = malloc(sizeof(Node));
-            to_return->type = NodeType_Positive;
             to_return->unary.operand = parser_parse_terminal_expression(parser);
-            break;
+            return to_return;
         case TokenType_Minus:
             parser_advance(parser);
-            to_return = malloc(sizeof(Node));
-            to_return->type = NodeType_Negative;
             to_return->unary.operand = parser_parse_terminal_expression(parser);
-            break;
-        default: break;
+            return to_return;
+        default:
+            parser_advance(parser);
+            return to_return;
     }
-    return to_return;
 }
 
-Node *parser_parse_infix_expression(Parser *parser, Token operator, Node *left)
+static Node *parser_parse_infix_expression(Parser *parser, Token operator, Node *left)
 {
     Node *to_return = malloc(sizeof(Node));
-    switch (operator.type)
-    {
-        case TokenType_Plus: to_return->type = NodeType_Add; break;
-        case TokenType_Minus: to_return->type = NodeType_Subtract; break;
-        case TokenType_Star: to_return->type = NodeType_Multiply; break;
-        case TokenType_Slash: to_return->type = NodeType_Divide; break;
-        case TokenType_Percent: to_return->type = NodeType_Modulo; break;
-        case TokenType_Caret: to_return->type = NodeType_Power; break;
-        default: break;
-    }
+    
+    to_return->type = binary_operation_lookup[operator.type];
     to_return->binary.left = left;
     to_return->binary.right = parser_parse_expression(parser, precedence_lookup[operator.type]);
-    
+
     return to_return;
 }
 
@@ -81,8 +83,6 @@ Node *parser_parse_expression(Parser *parser, Precedence previous_precedence)
     Token current_operator = *(parser->current);
     Precedence current_precedence = precedence_lookup[current_operator.type];
 
-    // All tokens with no precedence assigned to them will become Precedence_Min
-    // This includes the token with type TokenType_EOF, therefore we exit there automatically
     int is_current_operator_valid = current_precedence != Precedence_Min;
     while (is_current_operator_valid)
     {

@@ -1,7 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-typedef enum {
+typedef enum TokenType {
     TokenType_Error,
     TokenType_EOF,
 
@@ -16,18 +16,16 @@ typedef enum {
 
     TokenType_OpenParenthesis,
     TokenType_CloseParenthesis,
-    TokenType_Max,
 } TokenType;
 
-typedef enum {
+typedef enum NodeType {
     NodeType_Error,
+    
     NodeType_Number,
 
-    // Unaries
     NodeType_Positive,
     NodeType_Negative,
 
-    // Binaries
     NodeType_Add,
     NodeType_Subtract,
     NodeType_Multiply,
@@ -36,7 +34,7 @@ typedef enum {
     NodeType_Modulo,
 } NodeType;
 
-typedef enum {
+typedef enum Precedence {
     Precedence_Min,
 
     Precedence_Term,
@@ -46,18 +44,19 @@ typedef enum {
     Precedence_Max,
 } Precedence;
 
-typedef struct {
+typedef struct Token {
     TokenType type;
-    char *lexeme;
+    char *start;
+    char *end;
 } Token;
 
-typedef struct n {
+typedef struct Node {
     NodeType type;
     
     union {
         double value;
-        struct { struct n *operand; } unary;
-        struct { struct n *left; struct n *right; } binary;
+        struct { struct Node *operand; } unary;
+        struct { struct Node *left; struct Node *right; } binary;
     };
 } Node;
 

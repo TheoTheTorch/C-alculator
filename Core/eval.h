@@ -4,6 +4,6 @@
 #include <math.h>
 #include "types.h"
 
-double evaluate(Node *start_node);
+double evaluate(Node *root_node);
 
 #endif

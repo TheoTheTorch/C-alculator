@@ -7,7 +7,7 @@ Token *tokenize(char *expression)
     Lexer lexer;
     lexer_initialize(&lexer, &expression[0]);
 
-    // allocate the theoretical maximum amount of tokens + \0
+    // Theoretical max size
     Token *tokens = (Token*) malloc((strlen(expression) + 1) * sizeof(Token));
 
     for (int i = 0; 1; i++)
@@ -26,12 +26,6 @@ Token *tokenize(char *expression)
 
 void free_tokens(Token *tokens)
 {
-    for (int i = 0; 1; i++)
-    {
-        free(tokens[i].lexeme);
-
-        if (tokens[i].type == TokenType_EOF) break;
-    }
     free(tokens);
 }
 
@@ -39,7 +33,9 @@ void print_tokens(Token *tokens)
 {
     for (int i = 0; 1; i++)
     {
-        printf("token %s | type %d\n", tokens[i].lexeme, tokens[i].type);
+        int length = tokens[i].end - tokens[i].start;
+
+        printf("token %.*s | type %d\n", length, tokens[i].start, tokens[i].type);
 
         if (tokens[i].type == TokenType_EOF) break;
     }
@@ -47,13 +43,7 @@ void print_tokens(Token *tokens)
 
 Node *parse(Token *tokens)
 {
-    if (tokens[0].type == TokenType_EOF || tokens[0].type == TokenType_Error)
-    {
-        Node *to_return = (Node*) malloc(sizeof(Node));
-        Node temp = { .type = NodeType_Error };
-        to_return = &temp;
-        return to_return;
-    }
+    if (tokens[0].type == TokenType_EOF || tokens[0].type == TokenType_Error) return NULL;
 
     Parser parser;
     parser_initialize(&parser, tokens);
@@ -79,7 +69,7 @@ void free_nodes(Node *node_pointer)
     free(node_pointer);
 }
 
-void print_nodes(Node *node_pointer, int depth)
+static void print_nodes_recursively(Node *node_pointer, int depth)
 {
     if (node_pointer == NULL) return;
 
@@ -102,16 +92,21 @@ void print_nodes(Node *node_pointer, int depth)
     if ( node_pointer->type == NodeType_Positive || node_pointer->type == NodeType_Negative )
     {
         printf("--");
-        print_nodes(node_pointer->unary.operand, depth + 1);
+        print_nodes_recursively(node_pointer->unary.operand, depth + 1);
     } else if ( node_pointer->type != NodeType_Number )
     {
         printf("----");
-        print_nodes(node_pointer->binary.left, depth + 1);
+        print_nodes_recursively(node_pointer->binary.left, depth + 1);
         printf("\n");
         for (int i = 0; i < depth; i++) printf("       ");
         printf("   ~~~~");
-        print_nodes(node_pointer->binary.right, depth + 1);
+        print_nodes_recursively(node_pointer->binary.right, depth + 1);
     }
+}
+
+void print_nodes(Node *root)
+{
+    print_nodes_recursively(root, 0);
 }
 
 double evaluate_expression(char *expression)
@@ -122,7 +117,7 @@ double evaluate_expression(char *expression)
 
     Node *root_node = parse(tokens);
 
-    print_nodes(root_node, 0);
+    print_nodes(root_node);
     printf("\n");
     
     double result = evaluate(root_node);

@@ -1,17 +1,17 @@
 #include "lexer.h"
 
-void lexer_initialize(Lexer *lexer, char *expression_start)
+void lexer_initialize(Lexer *lexer, char *expression)
 {
-    lexer->start = expression_start;
-    lexer->current = expression_start;
+    lexer->start = expression;
+    lexer->current = expression;
 }
 
-void lexer_advance(Lexer *lexer)
+static void lexer_advance(Lexer *lexer)
 {
     lexer->current += 1;
 }
 
-void lexer_skip_whitespace(Lexer *lexer)
+static void lexer_skip_whitespace(Lexer *lexer)
 {
     while (isspace(*lexer->current))
     {
@@ -19,24 +19,16 @@ void lexer_skip_whitespace(Lexer *lexer)
     }
 }
 
-Token lexer_create_token(Lexer *lexer, TokenType type)
+static Token lexer_create_token(Lexer *lexer, TokenType type)
 {
-    int length = (lexer->current) - (lexer->start);
-    char *lexeme = (char*) malloc(length * sizeof(char));
-
-    for (int i = 0; i < length; i++)
-    {
-        lexeme[i] = *(lexer->start + i);
-    }
-    lexeme[length] = '\0';
-
     return (Token) {
         .type = type,
-        .lexeme = lexeme,
+        .start = lexer->start,
+        .end = lexer->current,
     };
 }
 
-Token lexer_number(Lexer *lexer)
+static Token lexer_create_number(Lexer *lexer)
 {
     while (isdigit(*lexer->current) || *lexer->current == '.')
     {
@@ -49,14 +41,9 @@ Token lexer_next_token(Lexer *lexer)
 {
     lexer_skip_whitespace(lexer);
     
+    lexer->start = lexer->current;
+    char current_character = *(lexer->current);
     lexer_advance(lexer);
-    lexer->start = lexer->current - 1;
-    char current_character = *(lexer->current - 1);
-
-    if (current_character == '\0')
-    {
-        return lexer_create_token(lexer, TokenType_EOF);
-    }
 
     switch (current_character)
     {
@@ -69,12 +56,13 @@ Token lexer_next_token(Lexer *lexer)
         case '^': return lexer_create_token(lexer, TokenType_Caret);
         case '(': return lexer_create_token(lexer, TokenType_OpenParenthesis);
         case ')': return lexer_create_token(lexer, TokenType_CloseParenthesis);
-
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':  case '.':
-            return lexer_number(lexer);
         
         default:
-            return lexer_create_token(lexer, TokenType_Error);
-    };
+            if (isdigit(current_character) || current_character == '.')
+            {
+                return lexer_create_number(lexer);
+            }
+            break;
+    }
+    return lexer_create_token(lexer, TokenType_Error);
 }

@@ -26,3 +26,7 @@ double evaluate(Node *node)
 
     return NAN;
 }
+
+#undef unary_node
+#undef left_node
+#undef right_node
