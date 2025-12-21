@@ -11,7 +11,7 @@
 
 Token *tokenize(char *expression);
 
-void free_tokens(Token *token);
+void free_tokens(Token *tokens);
 
 void print_tokens(Token *tokens);
 

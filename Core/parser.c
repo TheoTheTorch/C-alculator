@@ -18,12 +18,6 @@ static const NodeType binary_operation_type[] = {
     [TokenType_Caret] = NodeType_Power,
 };
 
-static const NodeType terminal_expression_type[] = {
-    [TokenType_Number] = NodeType_Number,
-    [TokenType_Plus] = NodeType_Positive,
-    [TokenType_Minus] = NodeType_Negative,
-};
-
 void parser_initialize(Parser *parser, Token *start)
 {
     parser->current_token = start;
@@ -34,48 +28,57 @@ static void parser_advance(Parser *parser)
     parser->current_token += 1;
 }
 
+static Node *create_node(NodeType type)
+{
+    Node *node = malloc(sizeof(Node));
+    node->type = type;
+    return node;
+}
+
 static Node *parser_parse_terminal_expression(Parser *parser)
 {
-    Node *to_return = malloc(sizeof(Node));
-    
-    to_return->type = terminal_expression_type[parser->current_token->type];
-    
-    switch (parser->current_token->type)
+    Token *token = parser->current_token;
+    parser_advance(parser);
+
+    switch (token->type)
     {
         case TokenType_Number:
-            Token *token = parser->current_token;
-            to_return->value = strtod(token->start, &token->end);
-            parser_advance(parser);
-            return to_return;
+        {
+            Node *node = create_node(NodeType_Number);
+            node->value = strtod(token->start, &token->end);
+            return node;
+        }
         case TokenType_OpenParenthesis:
-            parser_advance(parser);
-            to_return = parser_parse_expression(parser, Precedence_Min);
-            if (parser->current_token->type == TokenType_CloseParenthesis) parser_advance(parser);
-            return to_return;
+        {
+            Node *node = parser_parse_expression(parser, Precedence_Min);
+            if (parser->current_token->type == TokenType_CloseParenthesis)
+            {
+                parser_advance(parser);
+            }
+            return node;
+        }
         case TokenType_Plus:
-            parser_advance(parser);
-            to_return->unary.operand = parser_parse_terminal_expression(parser);
-            return to_return;
         case TokenType_Minus:
-            parser_advance(parser);
-            to_return->unary.operand = parser_parse_terminal_expression(parser);
-            return to_return;
+        {
+            Node *node = create_node((token->type == TokenType_Plus) ? NodeType_Positive : NodeType_Negative);
+            node->unary.operand = parser_parse_terminal_expression(parser);
+            return node;
+        }
         default:
-            parser_advance(parser);
-            return to_return;
+            return create_node(NodeType_Error);
     }
 }
 
 static Node *parser_parse_infix_expression(Parser *parser, Node *left)
 {
-    Node *to_return = malloc(sizeof(Node));
+    Token *token = parser->current_token;
+    Node *node = create_node(binary_operation_type[token->type]);
     
-    to_return->type = binary_operation_type[parser->current_token->type];
-    to_return->binary.left = left;
     parser_advance(parser);
-    to_return->binary.right = parser_parse_expression(parser, precedence[(parser->current_token - 1)->type]);
+    node->binary.left = left;
+    node->binary.right = parser_parse_expression(parser, precedence[token->type]);
 
-    return to_return;
+    return node;
 }
 
 Node *parser_parse_expression(Parser *parser, Precedence previous_precedence)
