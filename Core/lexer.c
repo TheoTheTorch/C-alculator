@@ -11,14 +11,6 @@ static void lexer_advance(Lexer *lexer)
     lexer->current += 1;
 }
 
-static void lexer_skip_whitespace(Lexer *lexer)
-{
-    while (isspace(*lexer->current))
-    {
-        lexer_advance(lexer);
-    }
-}
-
 static Token lexer_create_token(Lexer *lexer, TokenType type)
 {
     return (Token) {
@@ -26,6 +18,14 @@ static Token lexer_create_token(Lexer *lexer, TokenType type)
         .start = lexer->start,
         .end = lexer->current,
     };
+}
+
+static void lexer_skip_whitespace(Lexer *lexer)
+{
+    while (isspace(*lexer->current))
+    {
+        lexer_advance(lexer);
+    }
 }
 
 static Token lexer_create_number(Lexer *lexer)

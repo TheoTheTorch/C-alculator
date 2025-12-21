@@ -1,36 +1,5 @@
 #include "pipeline.h"
 
-Node *parse_expression(char *expression)
-{
-    Lexer lexer;
-    lexer_initialize(&lexer, expression);
-    Parser parser;
-    parser_initialize(&parser, &lexer, (Token (*)(void *))lexer_next_token);
-
-    return parser_parse_expression(&parser, Precedence_Min);
-}
-
-void free_ast(Node *node)
-{
-    if (node == NULL) return;
-
-    switch (node->type)
-    {
-        case NodeType_Positive:
-        case NodeType_Negative:
-            free_ast(node->unary.operand);
-            break;
-        case NodeType_Number:
-            break;
-        default:
-            free_ast(node->binary.left);
-            free_ast(node->binary.right);
-            break;
-    }
-
-    free(node);   
-}
-
 static const char *node_symbols[] = {
     [NodeType_Error] = "NaN",
     [NodeType_Number] = NULL,
@@ -44,12 +13,41 @@ static const char *node_symbols[] = {
     [NodeType_Power] = "(^)"
 };
 
+static Token lexer_next_token_logged(void *context)
+{
+    LexerContext *ctx = context;
+    Token token = lexer_next_token(ctx->lexer);
+    
+    if (ctx->print_tokens_flag)
+    {
+        int length = token.end - token.start;
+        printf("token %.*s | type %d\n", length, token.start, token.type);
+    }
+
+    return token;
+}
+
+static Node *parse_expression(char *expression, int print_tokens_flag)
+{
+    Lexer lexer;
+    lexer_initialize(&lexer, expression);
+
+    LexerContext context = {
+        .lexer = &lexer,
+        .print_tokens_flag = print_tokens_flag,
+    };
+
+    Parser parser;
+    parser_initialize(&parser, &context, &lexer_next_token_logged);
+
+    return parser_parse_expression(&parser, Precedence_Min);
+}
+
 static void print_nodes_recursively(Node *node, int depth)
 {
     if (node == NULL) return;
 
-    if (node->type == NodeType_Number)
-    {
+    if (node->type == NodeType_Number) {
         printf("%f", node->value);
     } else {
         printf("%s", node_symbols[node->type]);
@@ -81,11 +79,31 @@ void print_ast(Node *root)
     printf("\n");
 }
 
-double evaluate_expression(char *expression)
+void free_ast(Node *node)
 {
-    Node *root_node = parse_expression(expression);
+    if (node == NULL) return;
 
-    print_ast(root_node);
+    switch (node->type)
+    {
+        case NodeType_Positive:
+        case NodeType_Negative:
+            free_ast(node->unary.operand);
+            break;
+        case NodeType_Number:
+            break;
+        default:
+            free_ast(node->binary.left);
+            free_ast(node->binary.right);
+            break;
+    }
+    free(node);   
+}
+
+double evaluate_expression(char *expression, int print_tokens_flag, int print_ast_flag)
+{
+    Node *root_node = parse_expression(expression, print_tokens_flag);
+
+    if (print_ast_flag) print_ast(root_node);
     
     double result = evaluate(root_node);
     
