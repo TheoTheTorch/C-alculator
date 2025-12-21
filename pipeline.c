@@ -5,63 +5,77 @@ Node *parse_expression(char *expression)
     Lexer lexer;
     lexer_initialize(&lexer, expression);
     Parser parser;
-    parser_initialize(&parser, &lexer);
+    parser_initialize(&parser, &lexer, (Token (*)(void *))lexer_next_token);
 
     return parser_parse_expression(&parser, Precedence_Min);
 }
 
-void free_nodes(Node *node_pointer)
+void free_ast(Node *node)
 {
-    if (node_pointer == NULL) return;
+    if (node == NULL) return;
 
-    if ( node_pointer->type == NodeType_Positive || node_pointer->type == NodeType_Negative )
+    switch (node->type)
     {
-        free_nodes(node_pointer->unary.operand);
-    } else if ( node_pointer->type != NodeType_Number )
-    {
-        free_nodes(node_pointer->binary.left);
-        free_nodes(node_pointer->binary.right);
+        case NodeType_Positive:
+        case NodeType_Negative:
+            free_ast(node->unary.operand);
+            break;
+        case NodeType_Number:
+            break;
+        default:
+            free_ast(node->binary.left);
+            free_ast(node->binary.right);
+            break;
     }
 
-    free(node_pointer);
+    free(node);   
 }
 
-static void print_nodes_recursively(Node *node_pointer, int depth)
-{
-    if (node_pointer == NULL) return;
+static const char *node_symbols[] = {
+    [NodeType_Error] = "NaN",
+    [NodeType_Number] = NULL,
+    [NodeType_Positive] = "(+)",
+    [NodeType_Negative] = "(-)",
+    [NodeType_Add] = "(+)",
+    [NodeType_Subtract] = "(-)",
+    [NodeType_Multiply] = "(*)",
+    [NodeType_Divide] = "(/)",
+    [NodeType_Modulo] = "(%)",
+    [NodeType_Power] = "(^)"
+};
 
-    switch (node_pointer->type)
+static void print_nodes_recursively(Node *node, int depth)
+{
+    if (node == NULL) return;
+
+    if (node->type == NodeType_Number)
     {
-        case NodeType_Error: printf("NaN"); break;
-        case NodeType_Number: printf("%f", node_pointer->value); break;
-        
-        case NodeType_Positive: printf("(+)"); break;
-        case NodeType_Negative: printf("(-)"); break;
-        
-        case NodeType_Add: printf("(+)"); break;
-        case NodeType_Subtract: printf("(-)"); break;
-        case NodeType_Multiply: printf("(*)"); break;
-        case NodeType_Divide: printf("(/)"); break;
-        case NodeType_Modulo: printf("(%%)"); break;
-        case NodeType_Power: printf("(+)"); break;
+        printf("%f", node->value);
+    } else {
+        printf("%s", node_symbols[node->type]);
     }
 
-    if ( node_pointer->type == NodeType_Positive || node_pointer->type == NodeType_Negative )
+    switch (node->type)
     {
-        printf("--");
-        print_nodes_recursively(node_pointer->unary.operand, depth + 1);
-    } else if ( node_pointer->type != NodeType_Number )
-    {
-        printf("----");
-        print_nodes_recursively(node_pointer->binary.left, depth + 1);
-        printf("\n");
-        for (int i = 0; i < depth; i++) printf("       ");
-        printf("   ~~~~");
-        print_nodes_recursively(node_pointer->binary.right, depth + 1);
+        case NodeType_Positive:
+        case NodeType_Negative:
+            printf(">>>>");
+            print_nodes_recursively(node->unary.operand, depth + 1);
+            break;
+        case NodeType_Number:
+            break;
+        default:
+            printf("----");
+            print_nodes_recursively(node->binary.right, depth + 1);
+            printf("\n");
+            for (int i = 0; i < depth; i++) printf("       ");
+            printf("   ~~~~");
+            print_nodes_recursively(node->binary.left, depth + 1);
+            break;
     }
 }
 
-void print_nodes(Node *root)
+void print_ast(Node *root)
 {
     print_nodes_recursively(root, 0);
     printf("\n");
@@ -71,11 +85,11 @@ double evaluate_expression(char *expression)
 {
     Node *root_node = parse_expression(expression);
 
-    print_nodes(root_node);
+    print_ast(root_node);
     
     double result = evaluate(root_node);
     
-    free_nodes(root_node);
+    free_ast(root_node);
 
     return result;
 }

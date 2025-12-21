@@ -1,6 +1,10 @@
 #include "parser.h"
 
-static const Precedence precedence[] = {
+static Node *parser_parse_terminal_expression(Parser *parser);
+static Node *parser_parse_infix_expression(Parser *parser, Node *left);
+Node *parser_parse_expression(Parser *parser, Precedence previous_precedence);
+
+static Precedence precedence[] = {
     [TokenType_Plus] = Precedence_Term,
     [TokenType_Minus] = Precedence_Term,
     [TokenType_Star] = Precedence_Factor,
@@ -9,7 +13,7 @@ static const Precedence precedence[] = {
     [TokenType_Caret] = Precedence_Power,
 };
 
-static const NodeType binary_operation_type[] = {
+static NodeType binary_operation_type[] = {
     [TokenType_Plus] = NodeType_Add,
     [TokenType_Minus] = NodeType_Subtract,
     [TokenType_Star] = NodeType_Multiply,
@@ -18,15 +22,16 @@ static const NodeType binary_operation_type[] = {
     [TokenType_Caret] = NodeType_Power,
 };
 
-void parser_initialize(Parser *parser, Lexer *lexer)
+void parser_initialize(Parser *parser, void *context, Token (*advance) (void *context))
 {
-    parser->lexer = lexer;
-    parser->current_token = lexer_next_token(parser->lexer);
+    parser->context = context;
+    parser->advance = advance;
+    parser->current_token = parser->advance(parser->context);
 }
 
 static void parser_advance(Parser *parser)
 {
-    parser->current_token = lexer_next_token(parser->lexer);
+    parser->current_token = parser->advance(parser->context);
 }
 
 static Node *create_node(NodeType type)
@@ -70,7 +75,7 @@ static Node *parser_parse_terminal_expression(Parser *parser)
     }
 }
 
-Node *parser_parse_infix_expression(Parser *parser, Node *left)
+static Node *parser_parse_infix_expression(Parser *parser, Node *left)
 {
     Token token = parser->current_token;
     Node *node = create_node(binary_operation_type[token.type]);
@@ -93,3 +98,4 @@ Node *parser_parse_expression(Parser *parser, Precedence previous_precedence)
 
     return left;
 }
+

@@ -9,11 +9,7 @@
 #include "Core/parser.h"
 #include "Core/eval.h"
 
-Node *parse_expression(char *expression);
-
-void free_nodes(Node *root);
-
-void print_nodes(Node *root);
+void print_ast(Node *root);
 
 double evaluate_expression(char *expression);
 

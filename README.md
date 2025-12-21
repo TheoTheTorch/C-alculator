@@ -1,5 +1,11 @@
 # C-alculator
-A C project that takes an arithmetic operation and evaluates it.
+A lightweight C project that parses and evaluates an arithmetic expression from the command line.
+
+Usage:
+```Powershell
+.\compile
+.\c-alculator "((1.5 + 2.5) * 2) / (3 - 1) ^ 2"
+```
 
 Inspiration & Guidance: https://youtu.be/myZcNjKcVGw?si=gkroc_VdrHY4e-uT
 Resources:
@@ -7,6 +13,3 @@ Resources:
 - https://www.geeksforgeeks.org/c
 - https://stackoverflow.com
 - https://google.com
-
-# At no point did I use AI to aid in the making of this project.
-(It was a great learning expreience! :D)
