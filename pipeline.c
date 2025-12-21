@@ -1,13 +1,10 @@
 #include "pipeline.h"
 
 Token *tokenize(char *expression)
-{
-    if (strlen(expression) == 0) return NULL;
-    
+{   
     Lexer lexer;
     lexer_initialize(&lexer, &expression[0]);
 
-    // Theoretical max size
     Token *tokens = (Token*) malloc((strlen(expression) + 1) * sizeof(Token));
 
     for (int i = 0; 1; i++)
@@ -43,8 +40,6 @@ void print_tokens(Token *tokens)
 
 Node *parse(Token *tokens)
 {
-    if (tokens[0].type == TokenType_EOF || tokens[0].type == TokenType_Error) return NULL;
-
     Parser parser;
     parser_initialize(&parser, tokens);
 
@@ -77,10 +72,10 @@ static void print_nodes_recursively(Node *node_pointer, int depth)
     {
         case NodeType_Error: printf("NaN"); break;
         case NodeType_Number: printf("%f", node_pointer->value); break;
-        // Unaries
+        
         case NodeType_Positive: printf("(+)"); break;
         case NodeType_Negative: printf("(-)"); break;
-        // Binaries
+        
         case NodeType_Add: printf("(+)"); break;
         case NodeType_Subtract: printf("(-)"); break;
         case NodeType_Multiply: printf("(*)"); break;

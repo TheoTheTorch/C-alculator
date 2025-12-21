@@ -7,7 +7,7 @@
 
 typedef struct Parser
 {
-    Token *current;
+    Token *current_token;
 } Parser;
 
 void parser_initialize(Parser *parser, Token *start);
