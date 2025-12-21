@@ -1,5 +1,10 @@
 #include "pipeline.h"
 
+typedef struct {
+    Lexer *lexer;
+    int print_tokens_flag;
+} LexerContext;
+
 static const char *node_symbols[] = {
     [NodeType_Error] = "NaN",
     [NodeType_Number] = NULL,
@@ -13,16 +18,18 @@ static const char *node_symbols[] = {
     [NodeType_Power] = "(^)"
 };
 
-static Token lexer_next_token_logged(void *context)
+static void print_token(Token token)
+{
+    int length = token.end - token.start;
+    printf("token %.*s | type %d\n", length, token.start, token.type);
+}
+
+static Token lexer_next_token_with_print(void *context)
 {
     LexerContext *ctx = context;
     Token token = lexer_next_token(ctx->lexer);
     
-    if (ctx->print_tokens_flag)
-    {
-        int length = token.end - token.start;
-        printf("token %.*s | type %d\n", length, token.start, token.type);
-    }
+    if (ctx->print_tokens_flag) print_token(token);
 
     return token;
 }
@@ -38,7 +45,7 @@ static Node *parse_expression(char *expression, int print_tokens_flag)
     };
 
     Parser parser;
-    parser_initialize(&parser, &context, &lexer_next_token_logged);
+    parser_initialize(&parser, &context, &lexer_next_token_with_print);
 
     return parser_parse_expression(&parser, Precedence_Min);
 }
@@ -73,13 +80,13 @@ static void print_nodes_recursively(Node *node, int depth)
     }
 }
 
-void print_ast(Node *root)
+static void print_ast(Node *root)
 {
     print_nodes_recursively(root, 0);
     printf("\n");
 }
 
-void free_ast(Node *node)
+static void free_ast(Node *node)
 {
     if (node == NULL) return;
 
