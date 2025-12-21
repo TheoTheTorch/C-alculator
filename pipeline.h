@@ -9,19 +9,11 @@
 #include "Core/parser.h"
 #include "Core/eval.h"
 
-Token *tokenize(char *expression);
-
-void free_tokens(Token *tokens);
-
-void print_tokens(Token *tokens);
-
-
-Node *parse(Token *tokens);
+Node *parse_expression(char *expression);
 
 void free_nodes(Node *root);
 
 void print_nodes(Node *root);
-
 
 double evaluate_expression(char *expression);
 

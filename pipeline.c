@@ -1,51 +1,13 @@
 #include "pipeline.h"
 
-Token *tokenize(char *expression)
-{   
+Node *parse_expression(char *expression)
+{
     Lexer lexer;
-    lexer_initialize(&lexer, &expression[0]);
-
-    Token *tokens = (Token*) malloc((strlen(expression) + 1) * sizeof(Token));
-
-    for (int i = 0; 1; i++)
-    {
-        tokens[i] = lexer_next_token(&lexer);
-
-        if (tokens[i].type == TokenType_EOF)
-        {
-            tokens = (Token*) realloc(tokens, (i + 1) * sizeof(Token));
-            break;
-        }
-    }
-
-    return tokens;
-}
-
-void free_tokens(Token *tokens)
-{
-    free(tokens);
-}
-
-void print_tokens(Token *tokens)
-{
-    for (int i = 0; 1; i++)
-    {
-        int length = tokens[i].end - tokens[i].start;
-
-        printf("token %.*s | type %d\n", length, tokens[i].start, tokens[i].type);
-
-        if (tokens[i].type == TokenType_EOF) break;
-    }
-}
-
-Node *parse(Token *tokens)
-{
+    lexer_initialize(&lexer, expression);
     Parser parser;
-    parser_initialize(&parser, tokens);
+    parser_initialize(&parser, &lexer);
 
-    Node *to_return = parser_parse_expression(&parser, Precedence_Min); 
-    
-    return to_return;
+    return parser_parse_expression(&parser, Precedence_Min);
 }
 
 void free_nodes(Node *node_pointer)
@@ -102,22 +64,17 @@ static void print_nodes_recursively(Node *node_pointer, int depth)
 void print_nodes(Node *root)
 {
     print_nodes_recursively(root, 0);
+    printf("\n");
 }
 
 double evaluate_expression(char *expression)
 {
-    Token *tokens = tokenize(expression);
-
-    print_tokens(tokens);
-
-    Node *root_node = parse(tokens);
+    Node *root_node = parse_expression(expression);
 
     print_nodes(root_node);
-    printf("\n");
     
     double result = evaluate(root_node);
     
-    free_tokens(tokens);
     free_nodes(root_node);
 
     return result;

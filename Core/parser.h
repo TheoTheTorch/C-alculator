@@ -7,10 +7,11 @@
 
 typedef struct Parser
 {
-    Token *current_token;
+    Lexer *lexer;
+    Token current_token;
 } Parser;
 
-void parser_initialize(Parser *parser, Token *start);
+void parser_initialize(Parser *parser, Lexer *lexer);
 
 Node *parser_parse_expression(Parser *parser, Precedence previous_precedence);
 

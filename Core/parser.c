@@ -18,14 +18,15 @@ static const NodeType binary_operation_type[] = {
     [TokenType_Caret] = NodeType_Power,
 };
 
-void parser_initialize(Parser *parser, Token *start)
+void parser_initialize(Parser *parser, Lexer *lexer)
 {
-    parser->current_token = start;
+    parser->lexer = lexer;
+    parser->current_token = lexer_next_token(parser->lexer);
 }
 
 static void parser_advance(Parser *parser)
 {
-    parser->current_token += 1;
+    parser->current_token = lexer_next_token(parser->lexer);
 }
 
 static Node *create_node(NodeType type)
@@ -37,21 +38,21 @@ static Node *create_node(NodeType type)
 
 static Node *parser_parse_terminal_expression(Parser *parser)
 {
-    Token *token = parser->current_token;
+    Token token = parser->current_token;
     parser_advance(parser);
 
-    switch (token->type)
+    switch (token.type)
     {
         case TokenType_Number:
         {
             Node *node = create_node(NodeType_Number);
-            node->value = strtod(token->start, &token->end);
+            node->value = strtod(token.start, &token.end);
             return node;
         }
         case TokenType_OpenParenthesis:
         {
             Node *node = parser_parse_expression(parser, Precedence_Min);
-            if (parser->current_token->type == TokenType_CloseParenthesis)
+            if (parser->current_token.type == TokenType_CloseParenthesis)
             {
                 parser_advance(parser);
             }
@@ -60,7 +61,7 @@ static Node *parser_parse_terminal_expression(Parser *parser)
         case TokenType_Plus:
         case TokenType_Minus:
         {
-            Node *node = create_node((token->type == TokenType_Plus) ? NodeType_Positive : NodeType_Negative);
+            Node *node = create_node((token.type == TokenType_Plus) ? NodeType_Positive : NodeType_Negative);
             node->unary.operand = parser_parse_terminal_expression(parser);
             return node;
         }
@@ -69,14 +70,14 @@ static Node *parser_parse_terminal_expression(Parser *parser)
     }
 }
 
-static Node *parser_parse_infix_expression(Parser *parser, Node *left)
+Node *parser_parse_infix_expression(Parser *parser, Node *left)
 {
-    Token *token = parser->current_token;
-    Node *node = create_node(binary_operation_type[token->type]);
+    Token token = parser->current_token;
+    Node *node = create_node(binary_operation_type[token.type]);
     
     parser_advance(parser);
     node->binary.left = left;
-    node->binary.right = parser_parse_expression(parser, precedence[token->type]);
+    node->binary.right = parser_parse_expression(parser, precedence[token.type]);
 
     return node;
 }
@@ -85,7 +86,7 @@ Node *parser_parse_expression(Parser *parser, Precedence previous_precedence)
 {
     Node *left = parser_parse_terminal_expression(parser);
     
-    while (precedence[parser->current_token->type] > previous_precedence)
+    while (precedence[parser->current_token.type] > previous_precedence)
     {
         left = parser_parse_infix_expression(parser, left);
     }
