@@ -1,1 +1,1 @@
-gcc -Wall main.c .\pipeline.c .\Core\parser.c .\Core\lexer.c .\Core\eval.c -o c-alculator.exe
+gcc -Wall .\src\main.c .\src\pipeline.c .\src\Core\parser.c .\src\Core\lexer.c .\src\Core\eval.c -o c-alculator.exe
