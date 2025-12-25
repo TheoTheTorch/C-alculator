@@ -39,8 +39,6 @@ typedef enum Precedence {
     Precedence_Term,
     Precedence_Factor,
     Precedence_Power,
-
-    Precedence_Max,
 } Precedence;
 
 typedef struct Token {

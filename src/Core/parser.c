@@ -1,9 +1,5 @@
 #include "parser.h"
 
-static Node *parser_parse_terminal_expression(Parser *parser);
-static Node *parser_parse_infix_expression(Parser *parser, Node *left);
-Node *parser_parse_expression(Parser *parser, Precedence previous_precedence);
-
 static Precedence precedence[] = {
     [TokenType_Plus] = Precedence_Term,
     [TokenType_Minus] = Precedence_Term,

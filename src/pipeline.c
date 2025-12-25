@@ -6,7 +6,6 @@ typedef struct {
 } LexerContext;
 
 static const char *node_symbols[] = {
-    [NodeType_Number] = NULL,
     [NodeType_Positive] = "(+)",
     [NodeType_Negative] = "(-)",
     [NodeType_Add] = "(+)",
@@ -67,12 +66,12 @@ static void print_nodes_recursively(Node *node, int depth)
 
     switch (node->type)
     {
+        case NodeType_Number:
+            break;
         case NodeType_Positive:
         case NodeType_Negative:
             printf(">>>>");
             print_nodes_recursively(node->unary.operand, depth + 1);
-            break;
-        case NodeType_Number:
             break;
         default:
             printf("----");
@@ -99,12 +98,11 @@ static void free_ast(Node *node)
     switch (node->type)
     {
         case NodeType_Error:
+        case NodeType_Number:
             break;
         case NodeType_Positive:
         case NodeType_Negative:
             free_ast(node->unary.operand);
-            break;
-        case NodeType_Number:
             break;
         default:
             free_ast(node->binary.left);
