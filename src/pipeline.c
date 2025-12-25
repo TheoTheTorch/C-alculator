@@ -6,7 +6,6 @@ typedef struct {
 } LexerContext;
 
 static const char *node_symbols[] = {
-    [NodeType_Error] = "NaN",
     [NodeType_Number] = NULL,
     [NodeType_Positive] = "(+)",
     [NodeType_Negative] = "(-)",
@@ -54,6 +53,12 @@ static void print_nodes_recursively(Node *node, int depth)
 {
     if (node == NULL) return;
 
+    if (node->type == NodeType_Error)
+    {
+        printf("Err");
+        return;
+    }
+
     if (node->type == NodeType_Number) {
         printf("%f", node->value);
     } else {
@@ -82,6 +87,7 @@ static void print_nodes_recursively(Node *node, int depth)
 
 static void print_ast(Node *root)
 {
+    printf("\nAbstract syntax tree:\n");
     print_nodes_recursively(root, 0);
     printf("\n");
 }
@@ -92,6 +98,8 @@ static void free_ast(Node *node)
 
     switch (node->type)
     {
+        case NodeType_Error:
+            break;
         case NodeType_Positive:
         case NodeType_Negative:
             free_ast(node->unary.operand);
@@ -108,6 +116,8 @@ static void free_ast(Node *node)
 
 double evaluate_expression(char *expression, int print_tokens_flag, int print_ast_flag)
 {
+    if (print_tokens_flag) printf("Tokens:\n");
+
     Node *root_node = parse_expression(expression, print_tokens_flag);
 
     if (print_ast_flag) print_ast(root_node);
@@ -115,6 +125,8 @@ double evaluate_expression(char *expression, int print_tokens_flag, int print_as
     double result = evaluate(root_node);
     
     free_ast(root_node);
+
+    if (print_tokens_flag || print_ast_flag) printf("\nValue: ");
 
     return result;
 }
