@@ -81,6 +81,9 @@ static Node *parser_parse_infix_expression(Parser *parser, Node *left)
     Node *node = create_node(binary_operation_type[token.type]);
     
     parser_advance(parser);
+
+    if (node->type == NodeType_Error) return node;
+    
     node->binary.left = left;
     node->binary.right = parser_parse_expression(parser, precedence[token.type]);
 
@@ -90,7 +93,7 @@ static Node *parser_parse_infix_expression(Parser *parser, Node *left)
 Node *parser_parse_expression(Parser *parser, Precedence previous_precedence)
 {
     Node *left = parser_parse_terminal_expression(parser);
-    
+
     while (precedence[parser->current_token.type] > previous_precedence)
     {
         left = parser_parse_infix_expression(parser, left);
