@@ -62,7 +62,8 @@ Token lexer_next_token(Lexer *lexer)
             {
                 return lexer_create_number(lexer);
             }
-            break;
+
+            lexer_advance(lexer);
+            return lexer_next_token(lexer);
     }
-    return lexer_create_token(lexer, TokenType_Error);
 }
