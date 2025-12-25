@@ -2,7 +2,6 @@
 #define TYPES_H
 
 typedef enum TokenType {
-    TokenType_Error,
     TokenType_EOF,
 
     TokenType_Number,
