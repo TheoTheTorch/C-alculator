@@ -63,7 +63,6 @@ Token lexer_next_token(Lexer *lexer)
                 return lexer_create_number(lexer);
             }
 
-            lexer_advance(lexer);
             return lexer_next_token(lexer);
     }
 }
